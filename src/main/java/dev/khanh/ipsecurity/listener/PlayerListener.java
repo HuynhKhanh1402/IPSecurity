@@ -50,7 +50,9 @@ public class PlayerListener implements Listener {
                 if (!checker.isValidPlayer(player)) {
                     checker.handleInvalidPlayer(player);
                 } else {
-                    handleValidPlayer(player);
+                    if (checker.isShouldValidate(player)) {
+                        handleValidPlayer(player);
+                    }
                 }
             });
         });

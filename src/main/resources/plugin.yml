@@ -4,6 +4,8 @@ main: dev.khanh.ipsecurity.IPSecurityPlugin
 api-version: '1.13'
 authors: [KhanhHuynh]
 description: Protect your server
+softdepend:
+  - DiscordSRV
 libraries:
   - com.zaxxer:HikariCP:5.1.0
   - net.dv8tion:JDA:5.0.0-beta.20

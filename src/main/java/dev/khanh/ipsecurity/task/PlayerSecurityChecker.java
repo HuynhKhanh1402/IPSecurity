@@ -140,6 +140,30 @@ public class PlayerSecurityChecker implements Runnable {
     }
 
     /**
+     * Check if player should be validated.
+     *
+     * @param player The {@link Player} need check.
+     * @return true if the player needs to be validated, false otherwise.
+     */
+    public boolean isShouldValidate(Player player) {
+        if (settings.isCheckOp() && player.isOp()) {
+            return true;
+        }
+
+        if (settings.isCheckGamemode() && player.getGameMode().equals(GameMode.CREATIVE)) {
+            return true;
+        }
+
+        for (String perm: settings.getCheckPermissions()) {
+            if (player.hasPermission(perm)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Cancels the task.
      */
     public void cancel() {

@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
 /**
@@ -70,14 +71,20 @@ public class DiscordBot {
         channel = guild.getTextChannelById(channelID);
         Preconditions.checkNotNull(channel, "Couldn't find any chat channel with id: " + channelID);
 
-        guild.updateCommands().addCommands(
-                Commands.slash("ipsecurity", "IPSecurity Commands")
-                        .addSubcommands(new SubcommandData("set", "Set player's ip")
-                                .addOption(OptionType.STRING, "player", "Player's name")
-                                .addOption(OptionType.STRING, "ip", "Player's ip"))
-                        .addSubcommands(new SubcommandData("remove", "Remove player's ip")
-                                .addOption(OptionType.STRING, "player", "Player's name"))
-        ).queue();
+        // Run sync delayed task to avoid DiscordSRV deleting commands
+        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            guild.updateCommands().addCommands(
+                    Commands.slash("ipsecurity", "IPSecurity Commands")
+                            .addSubcommands(new SubcommandData("set", "Set player's ip")
+                                    .addOption(OptionType.STRING, "player", "Player's name")
+                                    .addOption(OptionType.STRING, "ip", "Player's ip"))
+                            .addSubcommands(new SubcommandData("remove", "Remove player's ip")
+                                    .addOption(OptionType.STRING, "player", "Player's name"))
+            ).onErrorMap(throwable -> {
+                throwable.printStackTrace();
+                throw new RuntimeException(throwable);
+            }).onSuccess(commands -> PluginLogger.info("Registered slash commands")).queue();
+        }, 10);
 
         PluginLogger.info("Successfully initialized discord bot");
     }
