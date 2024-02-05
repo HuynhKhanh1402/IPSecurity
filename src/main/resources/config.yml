@@ -1,0 +1,80 @@
+#####################################
+# DO NOT CHANGE THIS VALUE MANUALLY #
+#####################################
+config-version: 0
+
+# Set to 'true' to enable debug mode
+debug: true
+
+storage:
+  # Type of storage, options include MYSQL, YAML, SQLITE
+  storage-type: SQLITE
+
+  mysql-properties:
+    # MYSQL database host address
+    host: localhost
+    # Port to connect to MYSQL
+    port: 3306
+    # Name of the database
+    database: database
+    # Username for MYSQL
+    username: root
+    # Password for MYSQL
+    password: ""
+    # Name of the table in the database
+    table: ipsecurity
+    # Additional parameters for MYSQL connection
+    # Example value: ?verifyServerCertificate=false&useSSL=true
+    # Note: Do not change this value if you do not know what it is
+    parameters: ""
+    # Connection pool settings
+    pool:
+      # Maximum number of connections in the pool
+      maximum-pool-size: 10
+      # Minimum number of idle connections in the pool
+      minimum-idle: 5
+      # Connection timeout in milliseconds
+      connection-timeout: 30000
+
+general:
+  # Shutdown server when the plugin is disabled
+  shutdown-on-disable: true
+  # Timezone of the Minecraft server
+  # See https://garygregory.wordpress.com/2013/06/18/what-are-the-java-timezone-ids/ to find your timezone
+  timezone: Asia/Ho_Chi_Minh
+  # Date format
+  # See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html to get your date format
+  date-format: dd/MM/yyyy HH:mm:ss
+  # Realtime protection
+  protect:
+    # Enable realtime protection
+    enable: true
+    # Interval for protection checks in tick
+    # Note: 1 second = 20 tick
+    interval: 100
+    methods:
+      # Enable protection for operator permissions
+      op: true
+      # Enable protection for game mode creative
+      gamemode: true
+      # List of permissions to be protected
+      permissions:
+        - "*"
+        - "group.admin"
+
+discord:
+  # Discord bot token
+  # See https://docs.discordbotstudio.org/setting-up-dbs/finding-your-bot-token to get bot token
+  token: "INPUT_YOUR_BOT_TOKEN"
+  # Discord server ID
+  # Note: To get the server ID, open Discord, go to Settings → Advanced and enable developer mode.
+  #       Then, right-click on the server title and select "Copy ID" to get the guild ID.
+  guild: "INPUT_YOUR_GUILD_ID"
+  # Role ID allowed to use this plugin
+  # Note: To get the role ID , enable developer mode in the Appearance section of your user settings, then go to the
+  #       role menu in the server settings and right-click on the role you want the ID of, then click "Copy ID"
+  role: "INPUT_YOUR_ROLE_ID_CAN_USE_THIS_PLUGIN"
+  # Channel ID for notifications on Discord
+  # Note: To get the channel ID, open Discord, go to Settings > Advanced and enable developer mode. Then, right-click
+  #       on the channel and select "Copy ID" to get the channel ID
+  notification-channel: "INPUT_YOUR_NOTIFY_CHANNEL_ID"

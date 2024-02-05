@@ -1,0 +1,16 @@
+name: IPSecurity
+version: '${project.version}'
+main: dev.khanh.ipsecurity.IPSecurityPlugin
+api-version: '1.13'
+authors: [KhanhHuynh]
+description: Protect your server
+libraries:
+  - com.zaxxer:HikariCP:5.1.0
+  - net.dv8tion:JDA:5.0.0-beta.20
+commands:
+  ipsecurity:
+    permission: ipsecurity.admin
+    aliases:
+      - ipp
+    description: "IPSecurity Command"
+    usage: /<command> [reload]

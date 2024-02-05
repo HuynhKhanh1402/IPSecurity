@@ -1,0 +1,110 @@
+#####################################
+# DO NOT CHANGE THIS VALUE MANUALLY #
+#####################################
+version: 1
+
+# Ingame messages
+minecraft:
+  # Kick message displayed to players who need to verify their IP.
+  kick-message: "&7[&c&lIPSecurity&7] &eYou need to verify your IP address!"
+  # Message displayed to players when their IP has been verified.
+  verified: "&7[&c&lIPSecurity&7] &aYour IP has been verified."
+  # Message displayed to players when they don't have permission to use a command.
+  no-permission: "&7[&c&lIPSecurity&7] &cYou don't have permission to use this command!"
+
+# Discord bot messages
+discord:
+  # The default format of discord message
+  # All the discord message will have same format of default embed message, but they can override it
+  default-embed:
+    # Title of the default embed message.
+    title: "IPSecurity"
+    # Embed message author properties
+    author:
+      name: "Developed by KhanhHuynh"
+      url: "https://discordapp.com/users/717658004954021921"
+      icon: "https://cdn.discordapp.com/avatars/717658004954021921/c321b742c73981aa01427a462de2a845.png?size=2048"
+    # The footer text
+    footer: "%time%"
+    # The image of embed message
+    image: "https://1000logos.net/wp-content/uploads/2018/10/Minecraft-Logo.png"
+    # The thumbnail of embed message
+    thumbnail: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Userbox_creeper.svg/1200px-Userbox_creeper.svg.png"
+
+  # Note:
+  # - You can also use section such as author, footer, image, thumbnail in the message to override the default message values
+  # - You can use colors in two formats: hexadecimal color code (#FFFFFF) and hexadecimal converted to decimal.
+  #     Ex: "#00FF00" (GREEN) or 65280 = #00FF00 because when you convert #00FF00 to decimal, it becomes 65280
+  #     See https://www.rapidtables.com/convert/number/hex-to-decimal.html to convert
+  messages:
+    # Displayed message indicating successful verification
+    verified:
+      color: 65280 # or you can use "#00FF00"
+      messages:
+        - "**Player:** %player%"
+        - "**IP:** %ip%"
+        - "**Status:** Verified ✅"
+
+    # Displayed message indicating failed verification
+    verified-failed:
+      color: 16711680
+      messages:
+        - "**Player:** %player%"
+        - "**IP:** %ip%"
+        - "**Status:** Verification failed ❌"
+
+    # Displayed message indicating lack of permission
+    no-permission:
+      color: 16711680
+      messages:
+        - "You do not have permission to use this command!"
+
+    # Displayed message indicating wrong channel usage
+    wrong-channel:
+      color: 16711680
+      messages:
+        - "This command are not allowed on this channel!"
+
+    # Displayed message indicating invalid syntax
+    invalid-syntax:
+      color: 16776960
+      messages:
+        - "Invalid command syntax!"
+
+    # Displayed message indicating invalid IP format
+    invalid-ip-format:
+      color: 16776960
+      messages:
+        - "Invalid IP format!"
+
+    # Displayed message indicating successful IP setting
+    set-ip-successful:
+      color: 65280
+      messages:
+        - "Successfully set IP `%ip%` for player `%player%`"
+
+    # Displayed message indicating failed IP setting.
+    set-ip-failed:
+      color: 16711680
+      messages:
+        - "Failed to set IP `%ip%` for player `%player%`"
+        - "Please check the console for more information about the error"
+
+    # Displayed message indicating successful IP removal.
+    remove-ip-successful:
+      color: 65280
+      messages:
+        - "Removed the IP of player `%player%`"
+
+    # Displayed message indicating failed IP removal.
+    remove-ip-failed:
+      color: 16711680
+      messages:
+        - "Failed to remove IP of player player `%player%`"
+        - "Please check the console for more information about the error"
+
+    # Displayed message indicating player not found.
+    not-found-player:
+      color: 16776960
+      messages:
+        - "Could not find any player with name `%player%`"
