@@ -63,7 +63,7 @@ public final class IPSecurityPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (!VersionUtil.isCurrentServerVersionNewerOrEqual("1.16")) {
+        if (!VersionUtil.isCurrentServerVersionNewerOrEqual("1.16") && !isFullDependencyVersion()) {
             getLogger().severe(
                     "Your server version is older than 1.16, so it does not support the automatic " +
                     "library loading feature. Please download the jar-with-dependencies version from the GitHub " +
@@ -184,6 +184,20 @@ public final class IPSecurityPlugin extends JavaPlugin {
      */
     public void reloadMessages() {
         messages = new Messages(this);
+    }
+
+
+    /**
+     * Check if this plugin is jar-with-dependencies version.
+     * @return true if this plugin is jar-with-dependencies version, otherwise false
+     */
+    private boolean isFullDependencyVersion() {
+        try {
+            Class.forName("net.dv8tion.jda.api.JDA");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
 }
