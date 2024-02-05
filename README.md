@@ -19,4 +19,4 @@
 [license-url]: https://github.com/HuynhKhanh1402/IPSecurity/blob/master/LICENSE.txt
 [patreon-shield]: https://img.shields.io/badge/patreon-donate-green.svg?style=for-the-badge
 [patreon-url]: https://paypal.me/khanhhuynh1402
-[logo-image]: https://cdn.discordapp.com/attachments/969522532443123732/1203247065631686736/ipsecurity.jpg
+[logo-image]: https://cdn.discordapp.com/attachments/969522532443123732/1203247065631686736/ipprotector.jpg
