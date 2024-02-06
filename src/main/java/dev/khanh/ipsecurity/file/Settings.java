@@ -50,6 +50,10 @@ public class Settings {
     private boolean isCheckGamemode;
     @Getter
     private List<String> checkPermissions;
+    @Getter
+    private boolean isAddIPButtonEnable;
+    @Getter
+    private String addIPButtonText;
 
     /**
      * Constructs a new Settings object.
@@ -88,12 +92,17 @@ public class Settings {
      */
     private void updateConfig() {
         int defVersion = defaultConfig.getInt("config-version", 0);
-        int currentVersion = defaultConfig.getInt("config-version", 0);
+        int currentVersion = config.getInt("config-version", 0);
 
         if (defVersion > currentVersion) {
             PluginLogger.info("Detected old version config trying to update");
 
-            // Future update
+            if (currentVersion == 0) {
+                config.set("general.add-ip-button.enable", true);
+                config.set("general.add-ip-button.text", "Add IP");
+            }
+
+            config.set("config-version", defVersion);
 
             plugin.saveConfig();
         }
@@ -142,6 +151,10 @@ public class Settings {
         isCheckGamemode = config.getBoolean("general.protect.methods.gamemode");
 
         checkPermissions = config.getStringList("general.protect.methods.permissions");
+
+        isAddIPButtonEnable = config.getBoolean("general.add-ip-button.enable");
+
+        addIPButtonText = config.getString("general.add-ip-button.text", "");
 
     }
 

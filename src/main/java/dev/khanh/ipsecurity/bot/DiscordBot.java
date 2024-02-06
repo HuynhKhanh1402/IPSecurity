@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -31,6 +32,7 @@ public class DiscordBot {
     private final Guild guild;
     private final Role role;
     private final TextChannel channel;
+    private DiscordBotListener listener;
 
     /**
      * Constructs a new DiscordBot instance.
@@ -45,8 +47,10 @@ public class DiscordBot {
 
         String token = section.getString("token");
 
+        listener = new DiscordBotListener(this);
+
         jda = JDABuilder.createDefault(token)
-                .addEventListeners(new DiscordBotListener(this))
+                .addEventListeners(listener)
                 .build();
 
         PluginLogger.info("Initializing discord bot...");
@@ -80,10 +84,7 @@ public class DiscordBot {
                                     .addOption(OptionType.STRING, "ip", "Player's ip"))
                             .addSubcommands(new SubcommandData("remove", "Remove player's ip")
                                     .addOption(OptionType.STRING, "player", "Player's name"))
-            ).onErrorMap(throwable -> {
-                throwable.printStackTrace();
-                throw new RuntimeException(throwable);
-            }).onSuccess(commands -> PluginLogger.info("Registered slash commands")).queue();
+            ).onSuccess(commands -> PluginLogger.info("Registered slash commands")).queue();
         }, 10);
 
         PluginLogger.info("Successfully initialized discord bot");
@@ -96,6 +97,15 @@ public class DiscordBot {
      */
     public void sendNotification(MessageEmbed messageEmbed) {
         TaskUtil.runAsync(() -> channel.sendMessageEmbeds(messageEmbed).queue());
+    }
+
+    /**
+     * Sends a notification message to the configured channel.
+     *
+     * @param message The {@link MessageCreateData} to send.
+     */
+    public void sendNotification(MessageCreateData message) {
+        TaskUtil.runAsync(() -> channel.sendMessage(message).queue());
     }
 
     /**

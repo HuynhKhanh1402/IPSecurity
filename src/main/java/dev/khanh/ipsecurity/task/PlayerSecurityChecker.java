@@ -2,16 +2,22 @@ package dev.khanh.ipsecurity.task;
 
 import dev.khanh.ipsecurity.IPSecurityPlugin;
 import dev.khanh.ipsecurity.bot.DiscordBot;
+import dev.khanh.ipsecurity.bot.listener.ButtonData;
 import dev.khanh.ipsecurity.file.Messages;
 import dev.khanh.ipsecurity.file.Settings;
 import dev.khanh.ipsecurity.util.TaskUtil;
 import lombok.Getter;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A task responsible for periodically checking player security.
@@ -81,7 +87,28 @@ public class PlayerSecurityChecker implements Runnable {
 
                 String kickMessage = ChatColor.translateAlternateColorCodes('&', messages.getKickMessage());
                 player.kickPlayer(kickMessage);
-                bot.sendNotification(messages.getInvalidMessageEmbed(player));
+
+                MessageEmbed messageEmbed = messages.getInvalidMessageEmbed(player);
+
+                if (settings.isAddIPButtonEnable()) {
+
+                    ButtonData buttonData = new ButtonData(UUID.randomUUID(), player.getName(), getStringIPAddress(player));
+
+                    Button button = Button.success(buttonData.getButtonUUID().toString(), settings.getAddIPButtonText());
+
+                    MessageCreateData data = new MessageCreateBuilder()
+                            .addEmbeds(messageEmbed)
+                            .setActionRow(button)
+                            .build();
+
+                    bot.sendNotification(data);
+
+                    bot.getListener().registerButtonListener(buttonData);
+
+                } else {
+                    bot.sendNotification(messageEmbed);
+                }
+
             }
         });
     }
@@ -97,10 +124,7 @@ public class PlayerSecurityChecker implements Runnable {
             return true;
         }
         String ip = plugin.getDataStorage().getPlayerIP(player.getName()).join();
-        return Objects.requireNonNull(
-                player.getAddress(),
-                "Unable to get " + player.getName() + "'s IP address"
-        ).getHostString().equals(ip);
+        return getStringIPAddress(player).equals(ip);
     }
 
     /**
@@ -114,10 +138,7 @@ public class PlayerSecurityChecker implements Runnable {
             return true;
         }
         String ip = plugin.getDataStorage().getPlayerIP(player.getName()).join();
-        return Objects.requireNonNull(
-                player.getAddress(),
-                "Unable to get " + player.getName() + "'s IP address"
-        ).getHostString().equals(ip);
+        return getStringIPAddress(player).equals(ip);
     }
 
     /**
@@ -130,10 +151,7 @@ public class PlayerSecurityChecker implements Runnable {
         for (String perm : settings.getCheckPermissions()) {
             if (player.hasPermission(perm)) {
                 String ip = plugin.getDataStorage().getPlayerIP(player.getName()).join();
-                return Objects.requireNonNull(
-                        player.getAddress(),
-                        "Unable to get " + player.getName() + "'s IP address"
-                ).getHostString().equals(ip);
+                return getStringIPAddress(player).equals(ip);
             }
         }
         return true;
@@ -161,6 +179,20 @@ public class PlayerSecurityChecker implements Runnable {
         }
 
         return false;
+    }
+
+    /**
+     * Get string IP address of player
+     *
+     * @param player The player gets IP address.
+     * @return The IP address as string
+     * @throws NullPointerException if player is null or unable to retrieve player ip address.
+     */
+    private String getStringIPAddress(Player player) {
+        return Objects.requireNonNull(
+                player.getAddress(),
+                "Unable to get " + player.getName() + "'s IP address"
+        ).getHostString();
     }
 
     /**

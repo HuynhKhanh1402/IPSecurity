@@ -3,14 +3,17 @@ package dev.khanh.ipsecurity.bot.listener;
 import dev.khanh.ipsecurity.IPSecurityPlugin;
 import dev.khanh.ipsecurity.bot.DiscordBot;
 import dev.khanh.ipsecurity.file.Messages;
-import dev.khanh.ipsecurity.util.TaskUtil;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +29,7 @@ public class DiscordBotListener extends ListenerAdapter {
     private final DiscordBot bot;
     private final IPSecurityPlugin plugin;
     private final Pattern IP_PATTERN = Pattern.compile("^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\\.(?!$)|$)){4}$");
+    private final Map<String, ButtonData> cachedButtons = new HashMap<>();
 
 
     /**
@@ -45,41 +49,76 @@ public class DiscordBotListener extends ListenerAdapter {
      */
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        TaskUtil.runAsync(() -> {
+        Messages messages = plugin.getMessages();
 
-            event.deferReply(false).queue();
+        Member member = event.getMember();
 
-            Messages messages = plugin.getMessages();
+        InteractionHook hook = event.getHook();
 
-            Member member = event.getMember();
+        if (bot.getRole() == null || member == null || !member.getRoles().contains(bot.getRole())){
+            event.deferReply(true).queue();
+            hook.sendMessageEmbeds(messages.getNoPermissionMessageEmbed()).queue();
+            return;
+        }
 
-            InteractionHook hook = event.getHook();
+        if (!event.getChannel().equals(bot.getChannel())){
+            event.deferReply(true).queue();
+            hook.sendMessageEmbeds(messages.getWrongChannelMessageEmbed()).queue();
+            return;
+        }
 
-            if (bot.getRole() == null || member == null || !member.getRoles().contains(bot.getRole())){
-                hook.sendMessageEmbeds(messages.getNoPermissionMessageEmbed()).queue();
+        if (event.getSubcommandName() == null){
+            if (event.getOptions().size() != 2){
+                event.deferReply(true).queue();
+                hook.sendMessageEmbeds(messages.getInvalidSyntaxMessageEmbed()).queue();
                 return;
             }
+        }
 
-            if (!event.getChannel().equals(bot.getChannel())){
-                hook.sendMessageEmbeds(messages.getWrongChannelMessageEmbed()).queue();
-                return;
-            }
+        if (event.getSubcommandName().equals("set")){
+            handleSetCommand(event, messages);
+        }
 
-            if (event.getSubcommandName() == null){
-                if (event.getOptions().size() != 2){
-                    hook.sendMessageEmbeds(messages.getInvalidSyntaxMessageEmbed()).queue();
-                    return;
-                }
-            }
+        if (event.getSubcommandName().equals("remove")){
+            handleRemoveCommand(event, messages);
+        }
+    }
 
-            if (event.getSubcommandName().equals("set")){
-                handleSetCommand(event, messages);
-            }
+    /**
+     * Handles buttons interactions from Discord.
+     *
+     * @param event The {@link ButtonInteractionEvent}.
+     */
+    @Override
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+        Button button = event.getButton();
+        Member member = event.getMember();
 
-            if (event.getSubcommandName().equals("remove")){
-                handleRemoveCommand(event, messages);
-            }
+        Messages messages = plugin.getMessages();
 
+        ButtonData buttonData = cachedButtons.get(button.getId());
+
+        if (buttonData == null) {
+            return;
+        }
+
+        if (bot.getRole() == null || member == null || !member.getRoles().contains(bot.getRole())){
+            event.deferReply(true).queue();
+            event.getHook().sendMessageEmbeds(messages.getNoPermissionMessageEmbed()).queue();
+            return;
+        }
+
+        String player = buttonData.getPlayerName();
+        String ip = buttonData.getIp();
+
+        event.deferReply(false).queue();
+
+        plugin.getDataStorage().setPlayerIP(buttonData.getPlayerName(), buttonData.getIp()).thenRunAsync(() -> {
+            event.getHook().sendMessageEmbeds(messages.getSetIpSuccessfulMessageEmbed(player, ip)).queue();
+        }).exceptionally(throwable -> {
+            event.getHook().sendMessageEmbeds(messages.getSetIpFailedMessageEmbed(player, ip)).queue();
+            throwable.printStackTrace();
+            throw new RuntimeException(throwable);
         });
     }
 
@@ -90,17 +129,21 @@ public class DiscordBotListener extends ListenerAdapter {
      */
     private void handleSetCommand(SlashCommandInteractionEvent event, Messages messages) {
         if (event.getOptions().size() != 2){
+            event.deferReply(true).queue();
             event.getHook().sendMessageEmbeds(messages.getInvalidSyntaxMessageEmbed()).queue();
             return;
         }
 
         if (!isValidIP(Objects.requireNonNull(event.getOption("ip")).getAsString())){
+            event.deferReply(true).queue();
             event.getHook().sendMessageEmbeds(messages.getInvalidIpFormatMessageEmbed()).queue();
             return;
         }
 
         String player = Objects.requireNonNull(event.getOption("player")).getAsString();
         String ip = Objects.requireNonNull(event.getOption("ip")).getAsString();
+
+        event.deferReply(false).queue();
 
         plugin.getDataStorage().setPlayerIP(player, ip).thenRunAsync(() -> {
             event.getHook().sendMessageEmbeds(messages.getSetIpSuccessfulMessageEmbed(player, ip)).queue();
@@ -118,11 +161,14 @@ public class DiscordBotListener extends ListenerAdapter {
      */
     private void handleRemoveCommand(SlashCommandInteractionEvent event, Messages messages) {
         if (event.getOptions().size() != 1) {
+            event.deferReply(false).queue();
             event.getHook().sendMessageEmbeds(messages.getInvalidSyntaxMessageEmbed()).queue();
             return;
         }
 
         String player = Objects.requireNonNull(event.getOption("player")).getAsString();
+
+        event.deferReply(false).queue();
 
         plugin.getDataStorage().removePlayerIP(player).thenAcceptAsync(flag -> {
             if (flag) {
@@ -146,5 +192,13 @@ public class DiscordBotListener extends ListenerAdapter {
     private boolean isValidIP(String ip) {
         Matcher matcher = IP_PATTERN.matcher(ip);
         return matcher.matches();
+    }
+
+    /**
+     * Register the button handle event
+     * @param buttonData the {@link ButtonData}
+     */
+    public void registerButtonListener(ButtonData buttonData) {
+        cachedButtons.put(buttonData.getButtonUUID().toString(), buttonData);
     }
 }

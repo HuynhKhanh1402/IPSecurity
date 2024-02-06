@@ -1,7 +1,7 @@
 #####################################
 # DO NOT CHANGE THIS VALUE MANUALLY #
 #####################################
-config-version: 0
+config-version: 1
 
 # Set to 'true' to enable debug mode
 debug: true
@@ -61,6 +61,13 @@ general:
       permissions:
         - "*"
         - "group.admin"
+
+  # The button to quickly add an IP address to the database is sent along with the verification failure message
+  add-ip-button:
+    # Turn the button on or off
+    enable: true
+    # The button text
+    text: "Add IP"
 
 discord:
   # Discord bot token
