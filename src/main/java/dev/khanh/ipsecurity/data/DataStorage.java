@@ -1,7 +1,5 @@
 package dev.khanh.ipsecurity.data;
 
-import org.bukkit.OfflinePlayer;
-
 import java.util.concurrent.CompletableFuture;
 
 /**
