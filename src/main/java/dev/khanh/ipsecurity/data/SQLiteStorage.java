@@ -3,7 +3,6 @@ package dev.khanh.ipsecurity.data;
 import dev.khanh.ipsecurity.IPSecurityPlugin;
 import dev.khanh.ipsecurity.util.PluginLogger;
 import lombok.Getter;
-import org.bukkit.OfflinePlayer;
 
 import java.io.File;
 import java.sql.*;
@@ -41,13 +40,13 @@ public class SQLiteStorage implements DataStorage {
         }
     }
     @Override
-    public CompletableFuture<Void> setPlayerIP(OfflinePlayer player, String ip) {
+    public CompletableFuture<Void> setPlayerIP(String playerName, String ip) {
         return CompletableFuture.runAsync(() -> {
-            String sql = "INSERT OR REPLACE INTO IPSecurity (UUID, IP) VALUES (?, ?)";
+            String sql = "INSERT OR REPLACE INTO IPSecurity (PLAYER_NAME, IP) VALUES (?, ?)";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-                preparedStatement.setString(1, player.getUniqueId().toString());
+                preparedStatement.setString(1, playerName);
                 preparedStatement.setString(2, ip);
 
                 preparedStatement.executeUpdate();
@@ -58,13 +57,13 @@ public class SQLiteStorage implements DataStorage {
     }
 
     @Override
-    public CompletableFuture<String> getPlayerIP(OfflinePlayer player) {
+    public CompletableFuture<String> getPlayerIP(String playerName) {
         return CompletableFuture.supplyAsync(() -> {
-            String sql = "SELECT * FROM IPSecurity WHERE UUID = ?";
+            String sql = "SELECT * FROM IPSecurity WHERE PLAYER_NAME = ?";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-                preparedStatement.setString(1, player.getUniqueId().toString());
+                preparedStatement.setString(1, playerName);
 
                 ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -77,13 +76,13 @@ public class SQLiteStorage implements DataStorage {
     }
 
     @Override
-    public CompletableFuture<Boolean> removePlayerIP(OfflinePlayer player) {
+    public CompletableFuture<Boolean> removePlayerIP(String playerName) {
         return CompletableFuture.supplyAsync(() -> {
-            String sql = "DELETE FROM IPSecurity WHERE UUID = ?";
+            String sql = "DELETE FROM IPSecurity WHERE PLAYER_NAME = ?";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
 
-                preparedStatement.setString(1, player.getUniqueId().toString());
+                preparedStatement.setString(1, playerName);
 
                 return preparedStatement.executeUpdate() > 0;
 
@@ -106,7 +105,7 @@ public class SQLiteStorage implements DataStorage {
 
     private void createTable() {
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS IPSecurity (UUID CHAR(36) PRIMARY KEY, IP VARCHAR(64) NOT NULL)");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS IPSecurity (PLAYER_NAME VARCHAR(64) PRIMARY KEY, IP VARCHAR(64) NOT NULL)");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

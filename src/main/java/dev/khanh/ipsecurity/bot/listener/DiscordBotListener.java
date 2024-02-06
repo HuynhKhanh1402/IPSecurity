@@ -104,14 +104,7 @@ public class DiscordBotListener extends ListenerAdapter {
         String player = Objects.requireNonNull(event.getOption("player")).getAsString();
         String ip = Objects.requireNonNull(event.getOption("ip")).getAsString();
 
-        //noinspection deprecation
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
-        if (!offlinePlayer.hasPlayedBefore()) {
-            event.getHook().sendMessageEmbeds(messages.getNotFoundPlayerMessageEmbed(player)).queue();
-            return;
-        }
-
-        plugin.getDataStorage().setPlayerIP(offlinePlayer, ip).thenRunAsync(() -> {
+        plugin.getDataStorage().setPlayerIP(player, ip).thenRunAsync(() -> {
             event.getHook().sendMessageEmbeds(messages.getSetIpSuccessfulMessageEmbed(player, ip)).queue();
         }).exceptionally(throwable -> {
             event.getHook().sendMessageEmbeds(messages.getSetIpFailedMessageEmbed(player, ip)).queue();
@@ -133,14 +126,7 @@ public class DiscordBotListener extends ListenerAdapter {
 
         String player = Objects.requireNonNull(event.getOption("player")).getAsString();
 
-        //noinspection deprecation
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
-        if (!offlinePlayer.hasPlayedBefore()) {
-            event.getHook().sendMessageEmbeds(messages.getNotFoundPlayerMessageEmbed(player)).queue();
-            return;
-        }
-
-        plugin.getDataStorage().removePlayerIP(offlinePlayer).thenAcceptAsync(flag -> {
+        plugin.getDataStorage().removePlayerIP(player).thenAcceptAsync(flag -> {
             if (flag) {
                 event.getHook().sendMessageEmbeds(messages.getRemoveIpSuccessfulMessageEmbed(player)).queue();
             } else {

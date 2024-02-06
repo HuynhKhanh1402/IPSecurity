@@ -6,7 +6,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import dev.khanh.ipsecurity.IPSecurityPlugin;
 import dev.khanh.ipsecurity.util.PluginLogger;
 import lombok.Getter;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.sql.*;
@@ -75,14 +74,14 @@ public class MySQLStorage implements DataStorage {
         createTable();
     }
     @Override
-    public CompletableFuture<Void> setPlayerIP(OfflinePlayer player, String ip) {
+    public CompletableFuture<Void> setPlayerIP(String playerName, String ip) {
         return CompletableFuture.runAsync(() -> {
             try (Connection connection = dataSource.getConnection()){
 
-                String sql = String.format("INSERT INTO %s (UUID, IP) VALUES (?, ?) ON DUPLICATE KEY UPDATE IP = ?", table);
+                String sql = String.format("INSERT INTO %s (PLAYER_NAME, IP) VALUES (?, ?) ON DUPLICATE KEY UPDATE IP = ?", table);
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
-                preparedStatement.setString(1, player.getUniqueId().toString());
+                preparedStatement.setString(1, playerName);
                 preparedStatement.setString(2, ip);
                 preparedStatement.setString(3, ip);
 
@@ -95,14 +94,14 @@ public class MySQLStorage implements DataStorage {
     }
 
     @Override
-    public CompletableFuture<String> getPlayerIP(OfflinePlayer player) {
+    public CompletableFuture<String> getPlayerIP(String playerName) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = dataSource.getConnection()){
 
-                String sql = String.format("SELECT * FROM %s WHERE UUID = ?", table);
+                String sql = String.format("SELECT * FROM %s WHERE PLAYER_NAME = ?", table);
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
-                preparedStatement.setString(1, player.getUniqueId().toString());
+                preparedStatement.setString(1, playerName);
 
                 ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -115,14 +114,14 @@ public class MySQLStorage implements DataStorage {
     }
 
     @Override
-    public CompletableFuture<Boolean> removePlayerIP(OfflinePlayer player) {
+    public CompletableFuture<Boolean> removePlayerIP(String playerName) {
         return CompletableFuture.supplyAsync(() -> {
            try (Connection connection = dataSource.getConnection()){
 
-               String sql = String.format("DELETE FROM %s WHERE UUID = ?", table);
+               String sql = String.format("DELETE FROM %s WHERE PLAYER_NAME = ?", table);
                PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
-               preparedStatement.setString(1, player.getUniqueId().toString());
+               preparedStatement.setString(1, playerName);
 
                return preparedStatement.executeUpdate() > 0;
 
@@ -147,7 +146,7 @@ public class MySQLStorage implements DataStorage {
         try (Connection connection = dataSource.getConnection()) {
             Statement statement = connection.createStatement();
             statement.executeUpdate(String.format(
-                    "CREATE TABLE IF NOT EXISTS %s (UUID CHAR(36) PRIMARY KEY, IP VARCHAR(64) NOT NULL)",
+                    "CREATE TABLE IF NOT EXISTS %s (PLAYER_NAME VARCHAR(64) PRIMARY KEY, IP VARCHAR(64) NOT NULL)",
                     table
             ));
         } catch (SQLException e) {

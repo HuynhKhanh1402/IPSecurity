@@ -96,7 +96,7 @@ public class PlayerSecurityChecker implements Runnable {
         if (!player.isOp()) {
             return true;
         }
-        String ip = plugin.getDataStorage().getPlayerIP(player).join();
+        String ip = plugin.getDataStorage().getPlayerIP(player.getName()).join();
         return Objects.requireNonNull(
                 player.getAddress(),
                 "Unable to get " + player.getName() + "'s IP address"
@@ -113,7 +113,7 @@ public class PlayerSecurityChecker implements Runnable {
         if (!player.getGameMode().equals(GameMode.CREATIVE)) {
             return true;
         }
-        String ip = plugin.getDataStorage().getPlayerIP(player).join();
+        String ip = plugin.getDataStorage().getPlayerIP(player.getName()).join();
         return Objects.requireNonNull(
                 player.getAddress(),
                 "Unable to get " + player.getName() + "'s IP address"
@@ -129,7 +129,7 @@ public class PlayerSecurityChecker implements Runnable {
     private boolean checkPermissions(Player player) {
         for (String perm : settings.getCheckPermissions()) {
             if (player.hasPermission(perm)) {
-                String ip = plugin.getDataStorage().getPlayerIP(player).join();
+                String ip = plugin.getDataStorage().getPlayerIP(player.getName()).join();
                 return Objects.requireNonNull(
                         player.getAddress(),
                         "Unable to get " + player.getName() + "'s IP address"

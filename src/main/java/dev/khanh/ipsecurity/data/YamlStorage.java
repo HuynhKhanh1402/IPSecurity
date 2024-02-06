@@ -2,7 +2,6 @@ package dev.khanh.ipsecurity.data;
 
 import dev.khanh.ipsecurity.IPSecurityPlugin;
 import lombok.Getter;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -54,24 +53,24 @@ public class YamlStorage implements DataStorage {
     }
 
     @Override
-    public CompletableFuture<Void> setPlayerIP(OfflinePlayer player, String ip) {
+    public CompletableFuture<Void> setPlayerIP(String playerName, String ip) {
         return CompletableFuture.runAsync(() -> {
-            yaml.set(player.getUniqueId().toString(), ip);
+            yaml.set(playerName, ip);
             save();
         });
     }
 
     @Override
-    public CompletableFuture<String> getPlayerIP(OfflinePlayer player) {
-        return CompletableFuture.supplyAsync(() -> yaml.getString(player.getUniqueId().toString()));
+    public CompletableFuture<String> getPlayerIP(String playerName) {
+        return CompletableFuture.supplyAsync(() -> yaml.getString(playerName));
     }
 
     @Override
-    public CompletableFuture<Boolean> removePlayerIP(OfflinePlayer player) {
+    public CompletableFuture<Boolean> removePlayerIP(String playerName) {
         return CompletableFuture.supplyAsync(() -> {
-            boolean flag = yaml.contains(player.getUniqueId().toString());
+            boolean flag = yaml.contains(playerName);
 
-            yaml.set(player.getUniqueId().toString(), null);
+            yaml.set(playerName, null);
             save();
 
             return flag;
