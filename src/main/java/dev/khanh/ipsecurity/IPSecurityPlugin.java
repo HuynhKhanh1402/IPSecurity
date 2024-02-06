@@ -10,6 +10,7 @@ import dev.khanh.ipsecurity.file.Messages;
 import dev.khanh.ipsecurity.file.Settings;
 import dev.khanh.ipsecurity.listener.PlayerListener;
 import dev.khanh.ipsecurity.task.PlayerSecurityChecker;
+import dev.khanh.ipsecurity.task.UpdateChecker;
 import dev.khanh.ipsecurity.util.PluginLogger;
 import dev.khanh.ipsecurity.util.VersionUtil;
 import lombok.Getter;
@@ -91,6 +92,8 @@ public final class IPSecurityPlugin extends JavaPlugin {
         registerListeners(new PlayerListener(this));
 
         registerCommand();
+
+        runUpdateChecker();
     }
 
     @Override
@@ -198,6 +201,13 @@ public final class IPSecurityPlugin extends JavaPlugin {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    /**
+     * Run update checker task
+     */
+    private void runUpdateChecker() {
+        new UpdateChecker(this, 114940);
     }
 
 }
