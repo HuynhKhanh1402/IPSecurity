@@ -69,6 +69,9 @@ general:
     # The button text
     text: "Add IP"
 
+  # Enable or disable notifications when player is valid
+  send-valid-message: true
+
 discord:
   # Discord bot token
   # See https://docs.discordbotstudio.org/setting-up-dbs/finding-your-bot-token to get bot token

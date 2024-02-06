@@ -50,7 +50,7 @@ public class PlayerListener implements Listener {
                 if (!checker.isValidPlayer(player)) {
                     checker.handleInvalidPlayer(player);
                 } else {
-                    if (checker.isShouldValidate(player)) {
+                    if (checker.isShouldValidate(player) && plugin.getSettings().isSendValidMessage()) {
                         handleValidPlayer(player);
                     }
                 }

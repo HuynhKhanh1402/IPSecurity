@@ -54,6 +54,8 @@ public class Settings {
     private boolean isAddIPButtonEnable;
     @Getter
     private String addIPButtonText;
+    @Getter
+    private boolean isSendValidMessage;
 
     /**
      * Constructs a new Settings object.
@@ -100,6 +102,7 @@ public class Settings {
             if (currentVersion == 0) {
                 config.set("general.add-ip-button.enable", true);
                 config.set("general.add-ip-button.text", "Add IP");
+                config.set("general.send-valid-message", true);
             }
 
             config.set("config-version", defVersion);
@@ -155,6 +158,8 @@ public class Settings {
         isAddIPButtonEnable = config.getBoolean("general.add-ip-button.enable");
 
         addIPButtonText = config.getString("general.add-ip-button.text", "");
+
+        isSendValidMessage = config.getBoolean("general.send-valid-message");
 
     }
 
