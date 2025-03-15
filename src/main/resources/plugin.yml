@@ -4,6 +4,7 @@ main: dev.khanh.ipsecurity.IPSecurityPlugin
 api-version: '1.13'
 authors: [KhanhHuynh]
 description: Protect your server
+folia-supported: true
 softdepend:
   - DiscordSRV
 libraries:

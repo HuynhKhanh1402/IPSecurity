@@ -1,5 +1,7 @@
 package dev.khanh.ipsecurity;
 
+import com.github.Anon8281.universalScheduler.UniversalScheduler;
+import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import dev.khanh.ipsecurity.bot.DiscordBot;
 import dev.khanh.ipsecurity.command.IPSecurityCommand;
 import dev.khanh.ipsecurity.data.DataStorage;
@@ -31,6 +33,12 @@ public final class IPSecurityPlugin extends JavaPlugin {
      */
     @Getter
     private static IPSecurityPlugin instance;
+
+    /**
+     * TaskScheduler support Folia
+     */
+    @Getter
+    private TaskScheduler scheduler;
 
     /**
      * Settings of the plugin.
@@ -74,6 +82,8 @@ public final class IPSecurityPlugin extends JavaPlugin {
         }
 
         instance = this;
+
+        scheduler = UniversalScheduler.getScheduler(this);
 
         settings = new Settings(this);
 
@@ -146,7 +156,7 @@ public final class IPSecurityPlugin extends JavaPlugin {
             PluginLogger.info("Protecting methods:");
             PluginLogger.info(String.format(" %s  OP", (settings.isCheckOp() ? "✔" : "✘")));
             PluginLogger.info(String.format(" %s  Gamemode", (settings.isCheckGamemode() ? "✔" : "✘")));
-            PluginLogger.info(String.format(" %s  Permission", (settings.getCheckPermissions().size() != 0 ? "✔" : "✘")));
+            PluginLogger.info(String.format(" %s  Permission", (!settings.getCheckPermissions().isEmpty() ? "✔" : "✘")));
         }
     }
 

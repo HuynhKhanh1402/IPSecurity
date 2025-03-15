@@ -5,7 +5,6 @@ import dev.khanh.ipsecurity.file.Messages;
 import dev.khanh.ipsecurity.task.PlayerSecurityChecker;
 import dev.khanh.ipsecurity.util.TaskUtil;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,8 +16,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
  *
  * @author KhanhHuynh1402
  */
+@Getter
 public class PlayerListener implements Listener {
-    @Getter
     private final IPSecurityPlugin plugin;
 
     /**
@@ -37,12 +36,12 @@ public class PlayerListener implements Listener {
      */
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-           Player player = event.getPlayer();
+        Player player = event.getPlayer();
 
-           if (!player.isOnline()) {
-               return;
-           }
+        plugin.getScheduler().runTaskLater(player, () -> {
+            if (!player.isOnline()) {
+                return;
+            }
 
             PlayerSecurityChecker checker = plugin.getChecker();
 
@@ -55,7 +54,8 @@ public class PlayerListener implements Listener {
                     }
                 }
             });
-        });
+        }, 20L);
+
     }
 
     /**

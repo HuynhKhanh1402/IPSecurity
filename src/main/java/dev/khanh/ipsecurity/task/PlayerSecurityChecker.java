@@ -1,5 +1,6 @@
 package dev.khanh.ipsecurity.task;
 
+import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import dev.khanh.ipsecurity.IPSecurityPlugin;
 import dev.khanh.ipsecurity.bot.DiscordBot;
 import dev.khanh.ipsecurity.bot.listener.ButtonData;
@@ -28,7 +29,7 @@ public class PlayerSecurityChecker implements Runnable {
     @Getter
     private final IPSecurityPlugin plugin;
     @Getter
-    private final int taskID;
+    private final MyScheduledTask task;
     private final DiscordBot bot;
     private final Settings settings;
 
@@ -42,12 +43,11 @@ public class PlayerSecurityChecker implements Runnable {
         this.bot = plugin.getDiscordBot();
         this.settings = plugin.getSettings();
 
-        taskID = Bukkit.getScheduler().runTaskTimerAsynchronously(
-                plugin,
+        task = plugin.getScheduler().runTaskTimerAsynchronously(
                 this,
                 0,
                 plugin.getSettings().getProtectInterval()
-        ).getTaskId();
+        );
     }
 
     /**
@@ -81,7 +81,7 @@ public class PlayerSecurityChecker implements Runnable {
      * @param player The {@link Player} to handle.
      */
     public void handleInvalidPlayer(Player player) {
-        TaskUtil.runSync(() -> {
+        TaskUtil.runSync(player, () -> {
             if (player.isOnline()) {
                 Messages messages = plugin.getMessages();
 
@@ -199,6 +199,6 @@ public class PlayerSecurityChecker implements Runnable {
      * Cancels the task.
      */
     public void cancel() {
-        Bukkit.getScheduler().cancelTask(taskID);
+        task.cancel();
     }
 }

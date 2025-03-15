@@ -1,7 +1,7 @@
 package dev.khanh.ipsecurity.util;
 
 import dev.khanh.ipsecurity.IPSecurityPlugin;
-import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,15 +16,16 @@ public class TaskUtil {
      * @param task The task to run.
      */
     public static void runAsync(@NotNull Runnable task) {
-        Bukkit.getScheduler().runTaskAsynchronously(IPSecurityPlugin.getInstance(), task);
+        IPSecurityPlugin.getInstance().getScheduler().runTaskAsynchronously(task);
     }
 
     /**
      * Runs a task synchronously.
      *
+     * @param entity The entity of task
      * @param task The task to run.
      */
-    public static void runSync(@NotNull Runnable task) {
-        Bukkit.getScheduler().runTask(IPSecurityPlugin.getInstance(), task);
+    public static void runSync(@NotNull Entity entity, @NotNull Runnable task) {
+        IPSecurityPlugin.getInstance().getScheduler().runTask(entity, task);
     }
 }

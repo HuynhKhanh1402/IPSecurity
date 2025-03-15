@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
 /**
@@ -32,13 +31,14 @@ public class DiscordBot {
     private final Guild guild;
     private final Role role;
     private final TextChannel channel;
-    private DiscordBotListener listener;
+    private final DiscordBotListener listener;
 
     /**
      * Constructs a new DiscordBot instance.
      *
      * @param plugin The IPSecurityPlugin instance.
      */
+    @SuppressWarnings("deprecation")
     public DiscordBot(IPSecurityPlugin plugin) {
         this.plugin = plugin;
 
@@ -76,16 +76,14 @@ public class DiscordBot {
         Preconditions.checkNotNull(channel, "Couldn't find any chat channel with id: " + channelID);
 
         // Run sync delayed task to avoid DiscordSRV deleting commands
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-            guild.updateCommands().addCommands(
-                    Commands.slash("ipsecurity", "IPSecurity Commands")
-                            .addSubcommands(new SubcommandData("set", "Set player's ip")
-                                    .addOption(OptionType.STRING, "player", "Player's name")
-                                    .addOption(OptionType.STRING, "ip", "Player's ip"))
-                            .addSubcommands(new SubcommandData("remove", "Remove player's ip")
-                                    .addOption(OptionType.STRING, "player", "Player's name"))
-            ).onSuccess(commands -> PluginLogger.info("Registered slash commands")).queue();
-        }, 10);
+        plugin.getScheduler().scheduleSyncDelayedTask(() -> guild.updateCommands().addCommands(
+                Commands.slash("ipsecurity", "IPSecurity Commands")
+                        .addSubcommands(new SubcommandData("set", "Set player's ip")
+                                .addOption(OptionType.STRING, "player", "Player's name")
+                                .addOption(OptionType.STRING, "ip", "Player's ip"))
+                        .addSubcommands(new SubcommandData("remove", "Remove player's ip")
+                                .addOption(OptionType.STRING, "player", "Player's name"))
+        ).onSuccess(commands -> PluginLogger.info("Registered slash commands")).queue(), 10);
 
         PluginLogger.info("Successfully initialized discord bot");
     }

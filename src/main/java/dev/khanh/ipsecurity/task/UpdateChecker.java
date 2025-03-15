@@ -4,7 +4,6 @@ import dev.khanh.ipsecurity.IPSecurityPlugin;
 import dev.khanh.ipsecurity.util.PluginLogger;
 import dev.khanh.ipsecurity.util.VersionUtil;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.io.IOException;
@@ -16,10 +15,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * A task check for plugin updates.
  */
+@Getter
 public class UpdateChecker implements Runnable {
-    @Getter
     private final IPSecurityPlugin plugin;
-    @Getter
     private final int resourceID;
 
     /**
@@ -32,12 +30,7 @@ public class UpdateChecker implements Runnable {
         this.plugin = plugin;
         this.resourceID = resourceID;
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> Bukkit.getScheduler().runTaskTimerAsynchronously(
-                plugin,
-                this,
-                0L,
-                TimeUnit.HOURS.toSeconds(3) * 20
-        ));
+        plugin.getScheduler().runTaskTimerAsynchronously(this, 0, TimeUnit.HOURS.toSeconds(3) * 20);
     }
 
     /**
